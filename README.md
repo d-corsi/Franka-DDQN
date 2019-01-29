@@ -53,7 +53,6 @@ After this we will have the **ouput.mid** file in the same foleder.
 ## Authors
 
 * **Davide Corsi** - davide.corsi@univr.it
-* **Enrico Marchesini** - enrico.marchesini@univr.it
 
 ## License
 

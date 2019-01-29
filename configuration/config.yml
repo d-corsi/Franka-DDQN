@@ -1,0 +1,17 @@
+training:
+    episodes : 200000
+
+hyperparameters:
+    discount_factor : 0.99
+    epsilon_decay : 0.9995
+    epsilon_min : 0.01
+
+network_size:
+    state_size : 8
+    action_size : 10
+    batch_size : 64
+
+environment:
+    error : 0.06
+    step : 5
+    timeout: 500

@@ -1,0 +1,14 @@
+# exlude all midi file in the dataset
+midi_songs/*.mid
+
+# except one sample midi
+!midi_songs/Zelda.mid
+
+# exlude the note dictionary
+data/notes
+
+# except a placeholder
+!data/.gitkeep
+
+# exculde model
+*.hdf5

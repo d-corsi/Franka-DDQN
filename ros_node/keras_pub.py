@@ -1,7 +1,3 @@
-#!/usr/bin/env python
-# license removed for brevity
-from __future__ import print_function
-
 import rospy
 from std_msgs.msg import String
 from std_msgs.msg import Header
@@ -20,13 +16,6 @@ import keras
 from keras.models import Sequential, Model, load_model
 from keras.layers import Dense, Activation, InputLayer, Dropout
 
-'''
-def normalized_state(deg_vec):
-  normalizedState = []
-  for deg in (deg_vec):
-    normalizedState.append(deg / 100.0)
-  return normalizedState
-'''
 
 def normalized_state(deg_vec):
   minRange =  [-50,   -10,   -50,   -95,   -50,    0,   -50]
@@ -117,17 +106,17 @@ def endEffectorPos(joints):
 
   return x, y, z
 
-def load_model():
-  model = Sequential()
-  model.add(Dense(100, input_shape = (10, ), activation='tanh'))
-  model.add(Dense(100, activation = 'tanh'))
-  model.add(Dense(100, activation = 'tanh'))
-  model.add(Dense(14, activation = 'linear'))
-  model.compile(loss='mse', optimizer='adam', metrics=['mae'])
+def create_model():
+    model = Sequential()
+    model.add(Dense(64, input_shape=(10, ), activation='relu'))
+    model.add(Dense(64, activation='relu'))
+    model.add(Dense(64, activation='relu'))
+    model.add(Dense(14, activation = 'linear'))
+    model.compile(loss='mse', optimizer='adam', metrics=['mae'])
 
-  model.load_weights("backup.h5")
+    model.load_weights("backup.h5")
 
-  return model
+    return model
 
 def talker():
     marker_publisher = rospy.Publisher('visualization_marker', Marker, queue_size=10)
@@ -186,7 +175,7 @@ def talker():
 
       print ("Success :" + str(success) + "/" + str(sample + 1))
       print (target)
-      
+
 
 if __name__ == '__main__':
   try:

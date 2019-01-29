@@ -1,6 +1,6 @@
 # FRANKA - TRAJECTORY GENERATION
 
-Whistle is a software for music generation, allows you to train a neural network on any MIDI dataset.
+In this project I created a neural network for the generation of trajectories for the Franka manipulator. The generated model can then be used on the real robot via a ROS node, written in python with RosPy.
 
 ![Trajectory](/images/trajectory.gif)
 
@@ -9,46 +9,45 @@ Whistle is a software for music generation, allows you to train a neural network
 ### Requirements
 
 * Python 3.x
-* Installing the following packages using pip:
-	* Keras
-	* Tensorflow
-	* h5py
-    * Yaml
-    * Numpy
+* Installing the following packages:
+	* Keras, Tensorflow, h5py
+    * Yaml, Numpy
+	* ROS, Libfranka, RosPy
 
 ### Set-Up the environment
 
 - Clone this repo to your local machine using `git clone ...`.
-- Insert your MIDI files into the folder `/midi_songs`.
 - Edit the `config.yml` file with your preferences (you can leave the default settings).
-- You can edit the network structure inside the file `whistle_train.py`.
+- You can edit the network structure inside the file `training.py`.
 
 ### Train the Network
 
 To train the network you have to run **train.py**.
 ```
-python train.py
+python training.py
 ```
-this will ...
+this will generate a series of models whose success rate exceeds at least 90% of correct trajectories, these will will be saved in the **models** folder. The results of the training will be saved in the results folder, the most representative file is **reward_list.txt**. An example of plotted results is:
 
-### Run the Simulator
+![Trajectory](/images/results_plot.png)
 
-To run the network you have to run **whistle_run.py**. For the generation, the model **model.hdf5** will be used, so it will be necessary to rename in this way what one wants to use among the training ouput.
+### Run the ROS node
+
+- Install ROS and the Franka's libraries, both available on the official website.
+
+The ROS node is contained in the **ros_node** folder and is written with RosPy. To run the software on the simulator, after launching RViz with the libfranka libraries, just run the command:
 ```
-python whistle_run.py
+roslaunch keras_pub.py
 ```
-After this we will have the **ouput.mid** file in the same foleder.
+The ROS node is completely compatible with both the official visualizer and the real robot. In the figure below it is possible to see the comparison between the simulator and the robot.
 
-### Advice
-
-...
+![Trajectory](/images/simulator.gif)
 
 ## Built With
 
 * [Python](https://www.python.org/)
 * [Keras](https://keras.io/)
 * [Tensorflow](https://www.tensorflow.org/)
-* [Music21](http://web.mit.edu/music21/)
+* [ROS](http://www.ros.org/)
 
 ## Authors
 
@@ -57,15 +56,8 @@ After this we will have the **ouput.mid** file in the same foleder.
 ## License
 
 - **MIT license**
-- Copyright 2019 © **Davide Corsi** and **Enrico Marchesini**.
-
-## Todos
-- **TODO:** train to predict the note offset.
-- **TODO:** add intro and conclusion for the song.
-- **TODO:** implement a method for a non fixed offset between notes.
-- **TODO:** testing other netork hyperparameters.
-- **TODO:** try specific pattern generation as starting point for the network, instead a random sequence.
+- Copyright 2019 © **Davide Corsi**.
 
 ## Acknowledgments
 
-We have to thank ...
+I have to thank the IT department and the Altair robotics lab for making the robot available to me.

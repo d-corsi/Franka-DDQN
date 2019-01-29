@@ -1,14 +1,6 @@
-# exlude all midi file in the dataset
-midi_songs/*.mid
+# exlude the generated models (except 1)
+models/*.h5
+!models/model.h5
 
-# except one sample midi
-!midi_songs/Zelda.mid
-
-# exlude the note dictionary
-data/notes
-
-# except a placeholder
-!data/.gitkeep
-
-# exculde model
-*.hdf5
+# exlude the plotter.py
+results/plotter.py

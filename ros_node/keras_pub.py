@@ -16,10 +16,10 @@ import keras
 from keras.models import Sequential, Model, load_model
 from keras.layers import Dense, Activation, InputLayer, Dropout
 
-
+# Normalization funciton for the NN input
 def normalized_state(deg_vec):
-  minRange =  [-50,   -10,   -50,   -95,   -50,    0,   -50]
-  maxRange =  [ 50,    90,    50,    -5,    50,   95,    50]
+  min_range =  [-50, -10, -50, -95, -50, 90, 0]
+  max_range =  [ 50, 90, 50, -5, 50, 90, 0]
 
   normalizedState = []
   for i in range(7):
@@ -33,15 +33,17 @@ def normalized_state(deg_vec):
 
   return normalizedState
 
+# Support function for the degree to radians conversion
 def deg2rad(deg_vec):
     rad_vec = []
     for i in range(9):
       rad_vec.append(math.radians(deg_vec[i]))
     return rad_vec
 
+# Support function for the next state calculation
 def compute_new_state(state, action):
-  minRange =  [-50,   -10,   -50,   -95,   -50,    0,   -50]
-  maxRange =  [ 50,    90,    50,    -5,    50,   95,    50]
+  self.min_range =  [-50, -10, -50, -95, -50, 90, 0]
+  self.max_range =  [ 50, 90, 50, -5, 50, 90, 0]
 
   step = 2
 
@@ -53,21 +55,22 @@ def compute_new_state(state, action):
 
   return state
 
+# Support function for the target random generation
 def generate_target():
-
   t1 = np.random.randint(-50, 50)
   t2 = np.random.randint(-10, 90)
   t3 = np.random.randint(-50, 50)
   t4 = np.random.randint(-95, -5)
   t5 = np.random.randint(-50, 50)
-  t6 = np.random.randint(  0, 95)
-  t7 = np.random.randint(-50, 50)
+  t6 = 90
+  t7 = 0
 
   target_angle = [t1, t2, t3, t4, t5, t6, t7]
 
-  x, y, z = endEffectorPos( target_angle )
+  x, y, z = endEffectorPos(target_angle)
   return [x, y, z]
 
+# Support function for the marker printer
 def marker_spawn(marker_publisher, target, radius, color, marker_id):
     robotMarker = Marker()
     robotMarker.header.frame_id = 'panda_link0'
@@ -91,6 +94,7 @@ def marker_spawn(marker_publisher, target, radius, color, marker_id):
 
     marker_publisher.publish(robotMarker)
 
+# Get end effector position with the Franka forward kinematics
 def endEffectorPos(joints):
   t1 = joints[0]
   t2 = joints[1]
@@ -106,6 +110,7 @@ def endEffectorPos(joints):
 
   return x, y, z
 
+# Loading the kears model
 def create_model():
     model = Sequential()
     model.add(Dense(64, input_shape=(10, ), activation='relu'))
@@ -114,13 +119,14 @@ def create_model():
     model.add(Dense(14, activation = 'linear'))
     model.compile(loss='mse', optimizer='adam', metrics=['mae'])
 
-    model.load_weights("backup.h5")
+    model.load_weights("model.h5")
 
     return model
 
+# Main function
+# subscription to the visualziation topic and the franka joint topic
 def talker():
     marker_publisher = rospy.Publisher('visualization_marker', Marker, queue_size=10)
-
 
     pub = rospy.Publisher('joint_states', JointState, queue_size=10)
     rospy.init_node('joint_state_publisher')
@@ -131,25 +137,22 @@ def talker():
 
     for sample in range (3):
 
+      # Set the initial state and a random target
       state_deg = [0, 40, 0, -40, 0, 0, 0, 0, 0]
       target = generate_target()
 
-      target_fake = [0.24996699759338026, -0.42281411738967556, 0.5220085954218298]
-
-      target_middle = [0.37450022166722785, -0.3545424758397752, 0.6195838860925136]
-      target_base = [0.6193646599546465, 0.02470997975543915, 0.0014545226912595077]
-
-      target = target_middle
-
       #while not rospy.is_shutdown():
+      # Loop for the trajectory (max 150 step before shutdown)
       for _ in range(150):
+        # Set NN input and get the output
         input_layer = np.concatenate((normalized_state(state_deg[0:7]), target))
         action = np.argmax(model.predict(np.array([input_layer])))
-        state_deg = compute_new_state(state_deg, action)
-        state_deg[5] = 90
 
+        # Compute new state, degrees and rad
+        state_deg = compute_new_state(state_deg, action)
         state_rad = deg2rad(state_deg)
 
+        #Prepare the ROS msg
         msg = JointState()
         msg.header = Header()
         msg.header.stamp = rospy.Time.now()
@@ -158,13 +161,14 @@ def talker():
         msg.velocity = []
         msg.effort = []
 
+        #Publish message on the correct ros topic
         #rospy.loginfo(msg)
         pub.publish(msg)
 
+        # Draw marker graphic
         marker_spawn(marker_publisher, target, 0.05, [1, 0, 0], 0)
-        #marker_spawn(marker_publisher, target_fake, 0.08, [1, 0, 0], 0)
 
-
+        # Check if the target is reached
         x, y, z = endEffectorPos( state_deg[0:7] )
         distance = math.sqrt( math.pow((x-target[0]), 2) + math.pow((y-target[1]), 2) + math.pow((z-target[2]), 2) )
         if(distance < 0.05):
@@ -173,6 +177,7 @@ def talker():
 
         rate.sleep()
 
+      # Debug print, get the success rate of the test
       print ("Success :" + str(success) + "/" + str(sample + 1))
       print (target)
 

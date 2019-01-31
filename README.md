@@ -34,9 +34,9 @@ this will generate a series of models whose success rate exceeds at least 90% of
 
 - Install ROS and the Franka's libraries, both available on the official website.
 
-The ROS node is contained in the **ros_node** folder and is written with RosPy. To run the software on the simulator, after launching RViz with the libfranka libraries, just run the command:
+The ROS node is contained in the **ros_node** folder and is written with RosPy. To run the software on the simulator, after launching RViz with the libfranka libraries, just run the command, where **model.h5** is the trained NN model:
 ```
-roslaunch keras_pub.py
+roslaunch keras_pub.py model.h5
 ```
 The ROS node is completely compatible with both the official visualizer and the real robot. In the figure below it is possible to see the comparison between the simulator and the robot.
 
@@ -60,4 +60,4 @@ The ROS node is completely compatible with both the official visualizer and the 
 
 ## Acknowledgments
 
-I have to thank the IT department and the Altair robotics lab for making the robot available to me.
+I have to thank the IT department of UNIVR and the Altair robotics lab for making the robot available to me.

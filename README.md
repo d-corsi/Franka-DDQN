@@ -52,6 +52,7 @@ The ROS node is completely compatible with both the official visualizer and the 
 ## Authors
 
 * **Davide Corsi** - davide.corsi@univr.it
+* **Enrico Marchesini** - enrico.marchesini@univr.it
 
 ## License
 
